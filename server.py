@@ -29,16 +29,20 @@ def accept_incoming_connection():
         c, addr = s.accept()
         print('Got connection from', addr)
 
-        # send a thank you message to the client.
+        file = c.recv(1024).decode("utf8")
+        print(file)
         l = c.recv(1024)
+        print(l)
         while (l):
-            f = open('file_' + str(i) + ".txt", 'wb')  # Open in binary
+            file = c.recv(1024).decode("utf8")
+            l = c.recv(1024)
+            f = open(server_path+file, 'wb')  # Open in binary
             i = i + 1
             print("receiving")
             print(l)
             f.write(l)
             l = c.recv(1024)
-        f.close()
+            f.close()
         print("received")
         # Close the connection with the client
 

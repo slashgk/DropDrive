@@ -1,6 +1,12 @@
 import os
 import shutil
 import hashlib
+import socket
+
+s = socket.socket()
+port = 12347
+s.connect(('127.0.0.1', port))
+
 
 client_path = "e:\\sync\\"
 server_path = "e:\\server\\"
@@ -24,14 +30,27 @@ def sync():
         for file in dirFiles_client:
             if file not in dirFiles_server:
                 try:
-                    shutil.copy(client_path+file, server_path)
+                    s.send(bytes(file, "utf8"))
+                    f = open(client_path + file, "rb")
+                    l = f.read(1024)
+                    while(l):
+                        s.send(l)
+                        l=f.read(1024)
+                        print("Sending file")
+                    print("File sent")
                 except FileNotFoundError:
                     continue
             else:
                 if md5(client_path+file) != md5(server_path+file):
                     try:
-                        os.remove(server_path + file)
-                        shutil.copy(client_path + file, server_path)
+                        s.send(bytes(file, "utf8"))
+                        f = open(client_path + file, "rb")
+                        l = f.read(1024)
+                        while (l):
+                            s.send(l)
+                            l = f.read(1024)
+                            print("Sending file")
+                        print("File sent")
                     except FileNotFoundError:
                         continue
 
@@ -42,4 +61,6 @@ def sync():
                 except FileNotFoundError:
                     continue
 
-sync()
+
+if __name__ == "__main__":
+    sync()
