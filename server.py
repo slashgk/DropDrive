@@ -22,7 +22,9 @@ print("socket binded to %s" % (port))
 # a forever loop until we interrupt it or
 # an error occurs
 
-
+i=1
+f = open('file_'+ str(i)+".txt",'wb') # Open in binary
+i=i+1
 def accept_incoming_connection():
     while True:
         # Establish connection with client.
@@ -30,8 +32,14 @@ def accept_incoming_connection():
         print('Got connection from', addr)
 
         # send a thank you message to the client.
-        c.send(bytes("Yo", "utf8"))
-
+        l = c.recv(1024)
+        while (l):
+            print("receiving")
+            print(l)
+            f.write(l)
+            l = c.recv(1024)
+        f.close()
+        print("received")
         # Close the connection with the client
         c.close()
 
