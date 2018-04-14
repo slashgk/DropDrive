@@ -18,5 +18,13 @@ while (l):
     l = f.read(1024)
     print("Sending")
 print("Sent")
+f = open ("e:\\sync\\yope.txt", "rb")
+l = f.read(1024)
+
+while (l):
+    s.send(l)
+    l = f.read(1024)
+    print("Sending")
+print("Sent")
 # close the connection
 s.close()

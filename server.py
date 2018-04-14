@@ -5,6 +5,7 @@ import socket
 s = socket.socket()
 print("Socket successfully created")
 
+server_path = "e:\\server\\"
 # reserve a port on your computer in our
 # case it is 12345 but it can be anything
 port = 12347
@@ -21,11 +22,8 @@ print("socket binded to %s" % (port))
 
 # a forever loop until we interrupt it or
 # an error occurs
-
-i=1
-f = open('file_'+ str(i)+".txt",'wb') # Open in binary
-i=i+1
 def accept_incoming_connection():
+    i = 1
     while True:
         # Establish connection with client.
         c, addr = s.accept()
@@ -34,6 +32,8 @@ def accept_incoming_connection():
         # send a thank you message to the client.
         l = c.recv(1024)
         while (l):
+            f = open('file_' + str(i) + ".txt", 'wb')  # Open in binary
+            i = i + 1
             print("receiving")
             print(l)
             f.write(l)
@@ -41,7 +41,6 @@ def accept_incoming_connection():
         f.close()
         print("received")
         # Close the connection with the client
-        c.close()
 
 
 if __name__ == "__main__":
