@@ -22,12 +22,7 @@ def accept_incoming_connection():
         c, addr = s.accept()
         print('Got connection from', addr)
         while True:
-            dirFiles_server= os.listdir(server_path)
-            filename = 'list_of_files'
-            outfile = open(filename, 'wb')
-            pickle.dump(dirFiles_server, outfile)
-            outfile.close()
-            c.send(bytes(filename, "utf8"))
+
             size = c.recv(16)  # Note that you limit your filename length to 255 bytes.
             if not size:
                 break

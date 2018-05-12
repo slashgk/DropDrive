@@ -6,8 +6,8 @@ import pickle
 
 s = socket.socket()
 port = 12347
-s.connect(('127.0.0.1', port))
-
+c=s.connect(('127.0.0.1', port))
+print(c)
 
 client_path = "e:\\sync\\"
 
@@ -24,13 +24,11 @@ def md5(fname):
 
 
 def sync():
+    dirFiles_client = os.listdir(client_path)
+    
     while True:
-        dirFiles_client = os.listdir(client_path)
-        filename = s.recv(13)
-        infile = open(filename, 'rb')
-        dirFiles_server = pickle.load(infile)
-        infile.close()
         for file in dirFiles_client:
+            print("hhasdg")
             if file not in dirFiles_server:
                 filename = file
                 size = len(filename)
@@ -49,38 +47,7 @@ def sync():
                 s.sendall(l)
                 file_to_send.close()
                 print("File sent:"+file)
-                #shutil.copy(client_path + file, server_path)
-            else:
-                """
-                if md5(client_path+file) != md5(server_path+file):
-                    filename = file
-                    size = len(filename)
-                    size = bin(size)[2:].zfill(16)  # encode filename size as 16 bit binary
-                    # print(type(size))
-                    s.send(bytes(size, "utf8"))
-                    s.send(bytes(filename, "utf8"))
 
-                    filename = os.path.join(client_path, filename)
-                    filesize = os.path.getsize(filename)
-                    filesize = bin(filesize)[2:].zfill(32)  # encode filesize as 32 bit binary
-                    s.send(bytes(filesize, "utf8"))
-
-                    file_to_send = open(filename, 'rb')
-
-                    l = file_to_send.read()
-                    s.sendall(l)
-                    file_to_send.close()
-                    print("File sent:" + file)
-                    shutil.copy(client_path + file, server_path)
-                    
-
-        for file in dirFiles_server:
-            if file not in dirFiles_client:
-                try:
-                    os.remove(server_path+file)
-                except FileNotFoundError:
-                    continue
-"""
 
 if __name__ == "__main__":
     sync()
