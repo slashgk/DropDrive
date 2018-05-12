@@ -29,30 +29,44 @@ def sync():
         dirFiles_server = os.listdir(server_path)
         for file in dirFiles_client:
             if file not in dirFiles_server:
-                try:
-                    s.send(bytes(file, "utf8"))
-                    f = open(client_path + file, "rb")
-                    l = f.read(1024)
-                    while(l):
-                        s.send(l)
-                        l=f.read(1024)
-                        print("Sending file")
-                    print("File sent")
-                except FileNotFoundError:
-                    continue
+                filename = file
+                size = len(filename)
+                size = bin(size)[2:].zfill(16)  # encode filename size as 16 bit binary
+                #print(type(size))
+                s.send(bytes(size,"utf8"))
+                s.send(bytes(filename,"utf8"))
+
+                filename = os.path.join(client_path, filename)
+                filesize = os.path.getsize(filename)
+                filesize = bin(filesize)[2:].zfill(32)  # encode filesize as 32 bit binary
+                s.send(bytes(filesize,"utf8"))
+
+                file_to_send = open(filename, 'rb')
+
+                l = file_to_send.read()
+                s.sendall(l)
+                file_to_send.close()
+                print("File sent:"+file)
             else:
                 if md5(client_path+file) != md5(server_path+file):
-                    try:
-                        s.send(bytes(file, "utf8"))
-                        f = open(client_path + file, "rb")
-                        l = f.read(1024)
-                        while (l):
-                            s.send(l)
-                            l = f.read(1024)
-                            print("Sending file")
-                        print("File sent")
-                    except FileNotFoundError:
-                        continue
+                    filename = file
+                    size = len(filename)
+                    size = bin(size)[2:].zfill(16)  # encode filename size as 16 bit binary
+                    # print(type(size))
+                    s.send(bytes(size, "utf8"))
+                    s.send(bytes(filename, "utf8"))
+
+                    filename = os.path.join(client_path, filename)
+                    filesize = os.path.getsize(filename)
+                    filesize = bin(filesize)[2:].zfill(32)  # encode filesize as 32 bit binary
+                    s.send(bytes(filesize, "utf8"))
+
+                    file_to_send = open(filename, 'rb')
+
+                    l = file_to_send.read()
+                    s.sendall(l)
+                    file_to_send.close()
+                    print("File sent:" + file)
 
         for file in dirFiles_server:
             if file not in dirFiles_client:

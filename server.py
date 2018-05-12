@@ -6,15 +6,9 @@ s = socket.socket()
 print("Socket successfully created")
 
 server_path = "e:\\server\\"
-# reserve a port on your computer in our
-# case it is 12345 but it can be anything
+
 port = 12347
 
-# Next bind to the port
-# we have not typed any ip in the ip field
-# instead we have inputted an empty string
-# this makes the server listen to requests
-# coming from other computers on the network
 s.bind(('', port))
 print("socket binded to %s" % (port))
 
@@ -23,27 +17,28 @@ print("socket binded to %s" % (port))
 # a forever loop until we interrupt it or
 # an error occurs
 def accept_incoming_connection():
-    i = 1
-    while True:
         # Establish connection with client.
         c, addr = s.accept()
         print('Got connection from', addr)
+        while True:
+            size = c.recv(16)  # Note that you limit your filename length to 255 bytes.
+            if not size:
+                break
+            size = int(size, 2)
+            filename = c.recv(size).decode("utf8")
+            filesize = c.recv(32).decode("utf8")
+            filesize = int(filesize, 2)
+            file_to_write = open(server_path+filename, 'wb')
+            chunksize = 4096
+            while filesize > 0:
+                if filesize < chunksize:
+                    chunksize = filesize
+                data = c.recv(chunksize)
+                file_to_write.write(data)
+                filesize -= len(data)
 
-        file = c.recv(1024).decode("utf8")
-        print(file)
-        l = c.recv(1024)
-        print(l)
-        while (l):
-            file = c.recv(1024).decode("utf8")
-            l = c.recv(1024)
-            f = open(server_path+file, 'wb')  # Open in binary
-            i = i + 1
-            print("receiving")
-            print(l)
-            f.write(l)
-            l = c.recv(1024)
-            f.close()
-        print("received")
+            file_to_write.close()
+            print('File received successfully'+filename)
         # Close the connection with the client
 
 
